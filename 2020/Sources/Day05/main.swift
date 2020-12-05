@@ -23,11 +23,11 @@ struct BoardingPass {
             let row = try binarySearch(by: rowSpecification,
                                        lower: Character("F"),
                                        upper: Character("B"),
-                                       range: 0..<128)
+                                       range: 0...127)
             let column = try binarySearch(by: columnSpecification,
                                           lower: Character("L"),
                                           upper: Character("R"),
-                                          range: 0..<8)
+                                          range: 0...7)
             return row * 8 + column
         } catch let error {
             print(error)
@@ -42,9 +42,9 @@ extension BoardingPass {
                       index: Int = 0,
                       lower: Character,
                       upper: Character,
-                      range: Range<Int>) throws -> Int {
+                      range: ClosedRange<Int>) throws -> Int {
 
-        if range.lowerBound >= range.upperBound || range.count == 1 {
+        if range.lowerBound >= range.upperBound {
             return range.lowerBound
         }
 
@@ -56,13 +56,13 @@ extension BoardingPass {
                                     index: index + 1,
                                     lower: lower,
                                     upper: upper,
-                                    range: range.lowerBound..<midIndex)
+                                    range: range.lowerBound...midIndex)
         } else if selectedChar == upper {
             return try binarySearch(by: phrase,
                                     index: index + 1,
                                     lower: lower,
                                     upper: upper,
-                                    range: midIndex..<range.upperBound)
+                                    range: (midIndex+1)...range.upperBound)
         } else {
             throw BoardingPassError.invalidCharacter
         }
