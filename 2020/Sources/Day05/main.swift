@@ -73,17 +73,16 @@ extension Array where Element == BoardingPass.SeatID {
 
     func findMissingSeatID() -> BoardingPass.SeatID {
 
-        let sortedSeatIDs = self.sorted()
         var missingSeatID: BoardingPass.SeatID = 0
 
-        for i in 0..<sortedSeatIDs.count {
+        for i in 0..<self.count {
 
-            guard i+1 < sortedSeatIDs.count else {
+            guard i+1 < self.count else {
                 break
             }
 
-            let current = sortedSeatIDs[i]
-            let next = sortedSeatIDs[i+1]
+            let current = self[i]
+            let next = self[i+1]
 
             if next > (current + 1) {
                 missingSeatID = current + 1
@@ -96,15 +95,16 @@ extension Array where Element == BoardingPass.SeatID {
 }
 
 let boardingPasses = input
-    .split(whereSeparator: \.isNewline)
-    .map(String.init)
+    .components(separatedBy: .newlines)
     .map(BoardingPass.init)
 
-let seatIDs = boardingPasses.map { $0.calculateSeatID() }
+let seatIDs = boardingPasses
+    .map { $0.calculateSeatID() }
+    .sorted()
 
 // MARK: - Part One
 
-let highestSeatID = seatIDs.max() ?? 0
+let highestSeatID = seatIDs.last ?? 0
 print("Answer Part One: \(highestSeatID)")
 
 // MARK: - Part Two
