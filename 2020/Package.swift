@@ -6,6 +6,7 @@ import PackageDescription
 let package = Package(
     name: "2020",
     targets: [
+        .target(name: "Utilities"),
         .target(name: "Day01", dependencies: []),
         .target(name: "Day02", dependencies: []),
         .target(name: "Day03", dependencies: []),
