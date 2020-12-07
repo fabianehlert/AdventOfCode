@@ -10,11 +10,12 @@ let package = Package(
     ],
     targets: [
         .target(name: "Utilities"),
-        .target(name: "Day01"),
-        .target(name: "Day02"),
-        .target(name: "Day03"),
-        .target(name: "Day04"),
-        .target(name: "Day05"),
-        .target(name: "Day06", dependencies: ["Utilities"])
+        .target(name: "Day01", dependencies: ["Utilities"]),
+        .target(name: "Day02", dependencies: ["Utilities"]),
+        .target(name: "Day03", dependencies: ["Utilities"]),
+        .target(name: "Day04", dependencies: ["Utilities"]),
+        .target(name: "Day05", dependencies: ["Utilities"]),
+        .target(name: "Day06", dependencies: ["Utilities"]),
+        .target(name: "Day07", dependencies: ["Utilities"])
     ]
 )
