@@ -16,6 +16,7 @@ let package = Package(
         .target(name: "Day04", dependencies: ["Utilities"]),
         .target(name: "Day05", dependencies: ["Utilities"]),
         .target(name: "Day06", dependencies: ["Utilities"]),
-        .target(name: "Day07", dependencies: ["Utilities"])
+        .target(name: "Day07", dependencies: ["Utilities"]),
+        .target(name: "Day08", dependencies: ["Utilities"])
     ]
 )
