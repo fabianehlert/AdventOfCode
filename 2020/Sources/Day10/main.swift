@@ -5,8 +5,7 @@ let allowedJoltageDifference = 1...3
 
 var sortedAdapters = input
     .components(separatedBy: .newlines)
-    .map(Int.init)
-    .compactMap { $0 }
+    .compactMap(Int.init)
     .sorted()
 
 // MARK: - Part One
