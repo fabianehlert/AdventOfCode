@@ -9,24 +9,11 @@ let seatMap = input
     .components(separatedBy: .newlines)
     .map { $0.map(String.init) }
 
-// MARK: - Part One
+func fillSeats(_ seats: [[String]],
+               limit: Int,
+               adjacentSeats: (_ row: Int, _ column: Int, _ seats: [[String]]) -> [String]) -> Int {
 
-func partOne() -> Int {
-
-    func adjacentSeats(row: Int, column: Int, seats: [[String]]) -> [String] {
-        return [
-            seats[safe: row]?[safe: column-1],
-            seats[safe: row]?[safe: column+1],
-            seats[safe: row-1]?[safe: column],
-            seats[safe: row+1]?[safe: column],
-            seats[safe: row-1]?[safe: column-1],
-            seats[safe: row-1]?[safe: column+1],
-            seats[safe: row+1]?[safe: column-1],
-            seats[safe: row+1]?[safe: column+1]
-        ].compactMap { $0 }
-    }
-
-    var seats = seatMap
+    var seats = seats
     var hasChanges = true
 
     while hasChanges {
@@ -41,7 +28,7 @@ func partOne() -> Int {
 
                 guard element != floor else { continue }
 
-                let adjacent = adjacentSeats(row: row, column: column, seats: seats)
+                let adjacent = adjacentSeats(row, column, seats)
 
                 switch element {
                 case empty:
@@ -50,7 +37,7 @@ func partOne() -> Int {
                         hasChanges = true
                     }
                 case occupied:
-                    if adjacent.filter({ $0 == occupied }).count >= 4 {
+                    if adjacent.filter({ $0 == occupied }).count >= limit {
                         tempSeats[row][column] = empty
                         hasChanges = true
                     }
@@ -69,6 +56,26 @@ func partOne() -> Int {
         .count
 }
 
+// MARK: - Part One
+
+func partOne() -> Int {
+
+    func adjacentSeats(row: Int, column: Int, seats: [[String]]) -> [String] {
+        return [
+            seats[safe: row]?[safe: column-1],
+            seats[safe: row]?[safe: column+1],
+            seats[safe: row-1]?[safe: column],
+            seats[safe: row+1]?[safe: column],
+            seats[safe: row-1]?[safe: column-1],
+            seats[safe: row-1]?[safe: column+1],
+            seats[safe: row+1]?[safe: column-1],
+            seats[safe: row+1]?[safe: column+1]
+        ].compactMap { $0 }
+    }
+
+    return fillSeats(seatMap, limit: 4, adjacentSeats: adjacentSeats(row:column:seats:))
+}
+
 // MARK: - Part Two
 
 func partTwo() -> Int {
@@ -77,150 +84,42 @@ func partTwo() -> Int {
 
         var candidates = [String]()
 
-        // Top
-        for i in (0..<row).reversed() {
-            let element = seats[i][column]
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
+        struct Direction {
+            let row: Int
+            let column: Int
         }
 
-        // Right
-        for i in (column+1)..<seats[row].count {
-            let element = seats[row][i]
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
+        let directions = [
+            Direction(row: -1, column: 0), // Top
+            Direction(row: 0, column: 1), // Right
+            Direction(row: 1, column: 0), // Bottom
+            Direction(row: 0, column: -1), // Left
+
+            Direction(row: -1, column: -1), // Diag, Top Left
+            Direction(row: -1, column: 1), // Diag, Top Right
+            Direction(row: 1, column: -1), // Diag, Bottom Left
+            Direction(row: 1, column: 1) // Diag, Bottom Right
+        ]
+
+        for direction in directions {
+            var r = row + direction.row
+            var c = column + direction.column
+
+            while seats.indices.contains(r) && seats[r].indices.contains(c) {
+                let element = seats[r][c]
+                if element == empty || element == occupied {
+                    candidates.append(element)
+                    break
+                }
+
+                r += direction.row
+                c += direction.column
             }
         }
-
-        // Bottom
-        for i in (row+1)..<seats.count {
-            let element = seats[i][column]
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-        }
-
-        // Left
-        for i in (0..<column).reversed() {
-            let element = seats[row][i]
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-        }
-
-        // Top Left
-        var aRow = row - 1
-        var aColumn = column - 1
-        while aRow >= 0 && aColumn >= 0 {
-
-            let element = seats[aRow][aColumn]
-
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-
-            aRow -= 1
-            aColumn -= 1
-        }
-
-        // Top Right
-        var bRow = row - 1
-        var bColumn = column + 1
-        while bRow >= 0 && bColumn < seats[row].count {
-
-            let element = seats[bRow][bColumn]
-
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-
-            bRow -= 1
-            bColumn += 1
-        }
-
-        // Bottom Left
-        var cRow = row + 1
-        var cColumn = column - 1
-        while cRow < seats.count && cColumn >= 0 {
-
-            let element = seats[cRow][cColumn]
-
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-
-            cRow += 1
-            cColumn -= 1
-        }
-
-        // Bottom Right
-        var dRow = row + 1
-        var dColumn = column + 1
-        while dRow < seats.count && dColumn < seats[row].count {
-
-            let element = seats[dRow][dColumn]
-
-            if element == empty || element == occupied {
-                candidates.append(element)
-                break
-            }
-
-            dRow += 1
-            dColumn += 1
-        }
-
         return candidates
     }
 
-    var seats = seatMap
-    var hasChanges = true
-
-    while hasChanges {
-        hasChanges = false
-
-        var tempSeats = seats
-
-        for row in seats.indices {
-            for column in seats[row].indices {
-
-                let element = seats[row][column]
-
-                guard element != floor else { continue }
-
-                let adjacent = adjacentSeats(row: row, column: column, seats: seats)
-
-                switch element {
-                case empty:
-                    if !adjacent.contains(occupied) {
-                        tempSeats[row][column] = occupied
-                        hasChanges = true
-                    }
-                case occupied:
-                    if adjacent.filter({ $0 == occupied }).count >= 5 {
-                        tempSeats[row][column] = empty
-                        hasChanges = true
-                    }
-                default:
-                    break
-                }
-            }
-        }
-
-        seats = tempSeats
-    }
-
-    return seats
-        .flatMap { $0 }
-        .filter { $0 == occupied }
-        .count
+    return fillSeats(seatMap, limit: 5, adjacentSeats: adjacentSeats(row:column:seats:))
 }
 
 measure {
