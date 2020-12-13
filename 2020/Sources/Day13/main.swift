@@ -17,8 +17,6 @@ let lineOffsets = puzzle[1]
         return (Int(line.element)!, line.offset)
     }
 
-print(lineOffsets)
-
 // MARK: - Part One
 
 func partOne() -> Int {
